@@ -5,14 +5,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date
 
-
 st.set_page_config(page_title="BTC Strategy Backtester", layout="wide")
 
 st.title("📈 BTC Algorithmic Trading Strategy Backtester")
 
-# =========================
-# SIDEBAR INPUTS
-# =========================
+# ========================= 
+# SIDEBAR INPUTS 
+# ========================= 
 
 st.sidebar.header("Strategy Settings")
 st.sidebar.header("Backtest Settings")
@@ -45,6 +44,7 @@ strategy = st.sidebar.selectbox(
 )
 
 # Strategy-specific parameters
+# Strategy-specific parameters
 if strategy == "SMA":
     sma_window = st.sidebar.slider(
         "SMA Window",
@@ -52,6 +52,7 @@ if strategy == "SMA":
         max_value=200,
         value=20
     )
+
 else:
     rsi_lower = st.sidebar.slider(
         "RSI Lower Threshold",
@@ -66,6 +67,12 @@ else:
         value=70
     )
 
+   
+    if rsi_lower >= rsi_upper:
+        st.error("RSI lower threshold must be less than RSI upper threshold.")
+        st.stop()
+
+
 # =========================
 # DATA DOWNLOAD
 # =========================
@@ -78,9 +85,12 @@ def load_data(start, end):
 
 
 data = load_data(start_date, end_date).copy()
+if data.empty:
+    st.warning("No data available for the selected date range.")
+    st.stop()
 
 # =========================
-# INDICATORS & SIGNALS
+# INDICATORS & SIGNALS                                                       
 # =========================
 
 if strategy == "SMA":
@@ -110,7 +120,7 @@ else:
     data["Signal_Change"] = data["Signal"].diff()
 
 # =========================
-# BACKTEST ENGINE
+# BACKTEST ENGINE                                                       
 # =========================
 
 cash = initial_capital
@@ -191,3 +201,4 @@ ax.scatter(
 ax.legend()
 ax.grid(alpha=0.3)
 st.pyplot(fig)
+
